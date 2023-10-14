@@ -4,6 +4,7 @@ import socket
 PORT = 2020
 SERVER = socket.gethostbyname(socket.gethostname())
 ADDR = (SERVER, PORT)
+HEADER = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!dc"
 names = input('Choose your names >>> ')
@@ -14,9 +15,9 @@ client.connect(ADDR)
 def client_receive():
     while True:
         try:
-            message = client.recv(1024).decode('utf-8')
+            message = client.recv(HEADER).decode(FORMAT)
             if message == "names?":
-                client.send(names.encode('utf-8'))
+                client.send(names.encode(FORMAT))
             else:
                 print(message)
         except:
@@ -27,8 +28,14 @@ def client_receive():
 
 def client_send():
     while True:
-        message = f'{names}: {input("")}'
-        client.send(message.encode('utf-8'))
+        # message = f'{names} : {input("")}'
+        message = input("")
+        if message == DISCONNECT_MESSAGE:
+            client.send(DISCONNECT_MESSAGE.encode(FORMAT))  # encode and send the disconnect message
+            break  # exit the loop to close the thread when the user types !dc
+        else:
+            client.send(f'{names} : {message}'.encode(FORMAT))
+        
 
 
 receive_thread = threading.Thread(target=client_receive)
