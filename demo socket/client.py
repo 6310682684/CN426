@@ -29,7 +29,7 @@ def client_receive():
 def client_send():
     while True:
         # message = f'{names} : {input("")}'
-        message = input("")
+        message = input("[CLIENT] type message: ")
         if message == DISCONNECT_MESSAGE:
             client.send(DISCONNECT_MESSAGE.encode(FORMAT))  # encode and send the disconnect message
             break  # exit the loop to close the thread when the user types !dc

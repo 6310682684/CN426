@@ -35,7 +35,7 @@ def handle_client(client):
             clients_list.remove(client)
             client.close()
             names = name_list[index]
-            broadcast(f'{names} has left the chat room!'.encode(FORMAT))
+            broadcast(f'[SERVER] {names} has left the chat room!'.encode(FORMAT))
             name_list.remove(names)
             break
         
@@ -60,14 +60,14 @@ def handle_client(client):
 
 def receive():
     while True:
-        print('Server is running and listening ...')
+        print('[SERVER] Server is running and listening ...')
         client, address = server.accept()
-        print(f'connection is established with {str(address)}')
+        print(f'[SERVER] connection is established with {str(address)}')
         client.send('names?'.encode(FORMAT))
         names = client.recv(HEADER)
         name_list.append(names)
         clients_list.append(client)
-        print(f'The names of this client is {names.decode(FORMAT)}')
+        print(f'[SERVER] The names of this client is {names.decode(FORMAT)}')
         broadcast(f'{names.decode(FORMAT)} has connected to the chat room \n'.encode(FORMAT))
         client.send('you are now connected!'.encode(FORMAT))
         thread = threading.Thread(target=handle_client, args=(client,))
