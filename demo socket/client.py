@@ -1,5 +1,6 @@
 import threading
 import socket
+import os
 
 PORT = 2020
 SERVER = socket.gethostbyname(socket.gethostname())
@@ -7,6 +8,7 @@ ADDR = (SERVER, PORT)
 HEADER = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!dc"
+PING_COMMAND = "!ping"
 names = input('Choose your names >>> ')
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
@@ -33,6 +35,8 @@ def client_send():
         if message == DISCONNECT_MESSAGE:
             client.send(DISCONNECT_MESSAGE.encode(FORMAT))  # encode and send the disconnect message
             break  # exit the loop to close the thread when the user types !dc
+        if message == PING_COMMAND:
+            os.system("ping google.com")
         else:
             client.send(f'{names} : {message}'.encode(FORMAT))
         
