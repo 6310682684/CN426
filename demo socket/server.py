@@ -18,8 +18,9 @@ name_list = []
 PING_COMMAND = "!ping"
 
 
-def broadcast(message):
+def broadcast(message, sender = None):
     for client in clients_list:
+        # if client != sender:
         client.send(message)
 
 
@@ -52,7 +53,7 @@ def handle_client(client):
         #     except subprocess.CalledProcessError:
         #         client.send("Failed to execute ping command.".encode(FORMAT))
         else : 
-            broadcast(message)
+            broadcast(message, client)
 
         
 

@@ -21,7 +21,7 @@ def client_receive():
             if message == "names?":
                 client.send(names.encode(FORMAT))
             else:
-                print(message)
+                print("\n" + message)
         except:
             print('Error!')
             client.close()
