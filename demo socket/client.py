@@ -60,7 +60,7 @@ def client_send():
                     print(f"You are currently blocking the connection.")
             else:
                 print(f"Invalid command: {message}")
-               
+            
         if ping_status == "true" and not message.startswith("!"):
             client.send(f'{names} : {message}'.encode(FORMAT))
 
