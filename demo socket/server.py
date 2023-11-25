@@ -9,6 +9,7 @@ ADDR = (SERVER, PORT)
 HEADER = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!dc"
+SHOW_LIST = "!list"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind(ADDR)
 server.listen()
@@ -18,9 +19,18 @@ name_list = []
 PING_COMMAND = "!ping"
 
 
-def broadcast(message):
-    for client in clients_list:
-        client.send(message)
+def broadcast(message, sender=None):
+    if sender:
+        sender_name = name_list[clients_list.index(sender)].decode(FORMAT)
+        if message.startswith(b"!"):
+            sender.send(f'[SERVER] Command "{message.decode(FORMAT)}" acknowledged by {sender_name}'.encode(FORMAT))
+        else:
+            for client in clients_list:
+                if client != sender:
+                    client.send(message)
+    else:
+        for client in clients_list:
+            client.send(message)
 
 
 # handle clients'connections
@@ -39,21 +49,12 @@ def handle_client(client):
             name_list.remove(names)
             break
         
-        # test ping command
-        # elif message == PING_COMMAND.encode(FORMAT):
-        #     try:
-        #         process = subprocess.Popen(["ping", "-c", "4", "www.google.com"], stdout=subprocess.PIPE)
-        #         while True:
-        #             output = process.stdout.readline()
-        #             if output == b'' and process.poll() is not None:
-        #                 break
-        #             if output:
-        #                 client.send(f'Ping Log: {output.decode(FORMAT)}'.encode(FORMAT))
-        #     except subprocess.CalledProcessError:
-        #         client.send("Failed to execute ping command.".encode(FORMAT))
-        else : 
-            broadcast(message)
-
+        elif message == SHOW_LIST.encode(FORMAT):
+            names_str = ", ".join([name.decode(FORMAT) for name in name_list])
+            client.send(f'[SERVER] Connected users: {names_str}'.encode(FORMAT))
+            
+        else:
+            broadcast(message, sender=client)
         
 
 # recieve clients' connections

@@ -9,6 +9,10 @@ HEADER = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!dc"
 PING_COMMAND = "!ping"
+BLOCK_PING_COMMAND = "!noping"
+UNBLOCK_PING_COMMAND = "!allowping"
+SHOW_LIST = "!list"
+
 names = input('Choose your names >>> ')
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 client.connect(ADDR)
@@ -22,6 +26,7 @@ def client_receive():
                 client.send(names.encode(FORMAT))
             else:
                 print(message)
+                
         except:
             print('Error!')
             client.close()
@@ -29,18 +34,42 @@ def client_receive():
 
 
 def client_send():
+    ping_status = "true"
     while True:
         # message = f'{names} : {input("")}'
-        message = input("[CLIENT] type message: ")
+        message = input("")
+        
+        
         if message == DISCONNECT_MESSAGE:
             client.send(DISCONNECT_MESSAGE.encode(FORMAT))  # encode and send the disconnect message
             break  # exit the loop to close the thread when the user types !dc
-        if message == PING_COMMAND:
-            os.system("ping google.com")
-        else:
-            client.send(f'{names} : {message}'.encode(FORMAT))
         
+        if message.startswith("!"):
+            if message == BLOCK_PING_COMMAND:
+                ping_status = "false"
+                print("You have blocked the connection.")
+            elif message == UNBLOCK_PING_COMMAND:
+                ping_status = "true"
+                print("You have allowed the connection.")
+            elif message == SHOW_LIST:
+                client.send(SHOW_LIST.encode(FORMAT))
+            elif message == PING_COMMAND :
+                if ping_status == "true":
+                    os.system("ping google.com")
+                else:
+                    print(f"You are currently blocking the connection.")
+            else:
+                print(f"Invalid command: {message}")
+               
+        if ping_status == "true" and not message.startswith("!"):
+            client.send(f'{names} : {message}'.encode(FORMAT))
 
+        if ping_status == "false" and not message.startswith("!"):
+            if message == "!ping":
+                print(f"You are currently blocking the connection.")
+            else:
+                client.send(f'{names} : {message}'.encode(FORMAT))
+            
 
 receive_thread = threading.Thread(target=client_receive)
 receive_thread.start()
