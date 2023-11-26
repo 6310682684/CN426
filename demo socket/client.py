@@ -1,6 +1,7 @@
 import threading
 import socket
 import os
+import time
 
 PORT = 2020
 SERVER = socket.gethostbyname(socket.gethostname())
@@ -14,6 +15,8 @@ UNBLOCK_PING_COMMAND = "!allowping"
 BLOCK_USER_COMMAND = "!block"
 UNBLOCK_USER_COMMAND = "!unblock"
 SHOW_LIST = "!list"
+SHOW_BLOCKED_LIST = "!blocklist"
+SHOW_BLOCKED_USER = "!blockuser"
 
 names = input('Choose your names >>> ')
 client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -26,8 +29,12 @@ def client_receive():
             message = client.recv(HEADER).decode(FORMAT)
             if message == "names?":
                 client.send(names.encode(FORMAT))
+            elif message[0:22] == "[SERVER] Blocked user:":
+                print(message)
+                user = input("Select User from the block list: ")
+                client.send(("-" + user).encode(FORMAT))
             else:
-                print("\n" + message)
+                print(message)
         except:
             print('Error!')
             client.close()
@@ -59,11 +66,16 @@ def client_send():
                     os.system("ping google.com")
                 else:
                     print(f"You are currently blocking the connection.")
+            elif message == SHOW_BLOCKED_LIST:
+                client.send(SHOW_BLOCKED_LIST.encode(FORMAT))
+
             elif message == BLOCK_USER_COMMAND:
                 client.send(SHOW_LIST.encode(FORMAT))
-                print("Select User from the list (Number): ")
+                user = input("Select User from the list: ")
+                client.send(("@" + user).encode(FORMAT))
             elif message == UNBLOCK_USER_COMMAND:
-                print("Select User from the list (Number): ")
+                client.send(SHOW_BLOCKED_USER.encode(FORMAT))
+                time.sleep(1)
             else:
                 print(f"Invalid command: {message}")
             
