@@ -15,6 +15,7 @@ UNBLOCK_PING_COMMAND = "!allowping"
 BLOCK_USER_COMMAND = "!block"
 UNBLOCK_USER_COMMAND = "!unblock"
 SHOW_LIST = "!list"
+SHOW_OTHER_LIST = "!otherlist"
 SHOW_BLOCKED_LIST = "!blocklist"
 SHOW_BLOCKED_USER = "!blockuser"
 
@@ -70,7 +71,7 @@ def client_send():
                 client.send(SHOW_BLOCKED_LIST.encode(FORMAT))
 
             elif message == BLOCK_USER_COMMAND:
-                client.send(SHOW_LIST.encode(FORMAT))
+                client.send(SHOW_OTHER_LIST.encode(FORMAT))
                 user = input("Select User from the list: ")
                 client.send(("@" + user).encode(FORMAT))
             elif message == UNBLOCK_USER_COMMAND:

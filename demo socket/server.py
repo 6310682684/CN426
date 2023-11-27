@@ -10,6 +10,7 @@ HEADER = 1024
 FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!dc"
 SHOW_LIST = "!list"
+SHOW_OTHER_LIST = "!otherlist"
 SHOW_BLOCKED_LIST = "!blocklist"
 SHOW_BLOCKED_USER = "!blockuser"
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -38,9 +39,6 @@ def broadcast(message, sender=None):
             sender.send(f'[SERVER] Command "{message.decode(FORMAT)}" acknowledged by {sender_name}'.encode(FORMAT))
         else:
             for client in clients_list:
-                # print(block_list)
-                # print(name_list[clients_list.index(client)])
-                # print(block_list[f"b'{sender_name}'"])
                 if client != sender and sender_name not in block_list[f"{name_list[clients_list.index(client)]}"]:
                     client.send(message)
     else:
@@ -65,8 +63,16 @@ def handle_client(client):
             break
         
         elif message == SHOW_LIST.encode(FORMAT):
-            names_str = ", ".join([name.decode(FORMAT) if name != clients_list.index(client) else None for name in name_list])
+            names_str = ", ".join([name.decode(FORMAT) for name in name_list])
             client.send(f'[SERVER] Connected users: {names_str}'.encode(FORMAT))
+        
+        elif message == SHOW_OTHER_LIST.encode(FORMAT):
+            new_name_list = []
+            for name in name_list:
+                if name != name_list[clients_list.index(client)]:
+                    new_name_list.append(name)
+            names_str = ", ".join([name.decode(FORMAT) for name in new_name_list])
+            client.send(f'[SERVER] Other users: {names_str}'.encode(FORMAT))
         
         elif message == SHOW_BLOCKED_LIST.encode(FORMAT) or message == SHOW_BLOCKED_USER.encode(FORMAT):
             if len(block_list[f"{name_list[clients_list.index(client)]}"]) != 0:
